@@ -41,13 +41,13 @@ namespace CefSharp
             _disposables = gcnew HashSet<IDisposable^>();
         }
 
-        static void ParentProcessExitHandler(Object^ sender, EventArgs^ e)
+        /*static void ParentProcessExitHandler(Object^ sender, EventArgs^ e)
         {
             if (Cef::IsInitialized)
             {
                 Cef::Shutdown();
             }
-        }
+        }*/
 
     public:
         /// <summary>
@@ -206,10 +206,10 @@ namespace CefSharp
 
             _initialized = success;
 
-            if (_initialized && shutdownOnProcessExit)
+            /*if (_initialized && shutdownOnProcessExit)
             {
                 AppDomain::CurrentDomain->ProcessExit += gcnew EventHandler(ParentProcessExitHandler);
-            }
+            }*/
 
             return success;
         }
