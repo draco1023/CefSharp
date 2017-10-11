@@ -175,7 +175,7 @@ namespace CefSharp.Wpf
         {
             //Check if alreadty disposed
             if (Interlocked.Increment(ref disposeCount) == 1)
-            { 
+            {
                 // No longer reference event listeners:
                 ConsoleMessage = null;
                 FrameLoadStart = null;
@@ -222,7 +222,7 @@ namespace CefSharp.Wpf
                         CleanupElement.Unloaded -= OnCleanupElementUnloaded;
                     }
 
-                    if(managedCefBrowserAdapter != null)
+                    if (managedCefBrowserAdapter != null)
                     {
                         managedCefBrowserAdapter.Dispose();
                         managedCefBrowserAdapter = null;
@@ -294,8 +294,8 @@ namespace CefSharp.Wpf
 
             UiThreadRunAsync(delegate
             {
-                if(browser != null)
-                { 
+                if (browser != null)
+                {
                     var results = DragDrop.DoDragDrop(this, dataObject, GetDragEffects(mask));
                     browser.GetHost().DragSourceEndedAt(0, 0, GetDragOperationsMask(results));
                     browser.GetHost().DragSourceSystemDragEnded();
@@ -569,13 +569,13 @@ namespace CefSharp.Wpf
         protected virtual void OnIsBrowserInitializedChanged(bool oldValue, bool newValue)
         {
             if (newValue && !IsDisposed)
-            { 
+            {
                 var task = this.GetZoomLevelAsync();
                 task.ContinueWith(previous =>
                 {
                     if (previous.Status == TaskStatus.RanToCompletion)
                     {
-                        UiThreadRunAsync(() => 
+                        UiThreadRunAsync(() =>
                         {
                             if (!IsDisposed)
                             {
@@ -763,7 +763,7 @@ namespace CefSharp.Wpf
 
         private void OnDrop(object sender, DragEventArgs e)
         {
-            if(browser != null)
+            if (browser != null)
             {
                 browser.GetHost().DragTargetDragDrop(GetMouseEvent(e));
             }
@@ -771,7 +771,7 @@ namespace CefSharp.Wpf
 
         private void OnDragLeave(object sender, DragEventArgs e)
         {
-            if(browser != null)
+            if (browser != null)
             {
                 browser.GetHost().DragTargetDragLeave();
             }
@@ -779,7 +779,7 @@ namespace CefSharp.Wpf
 
         private void OnDragOver(object sender, DragEventArgs e)
         {
-            if(browser != null)
+            if (browser != null)
             {
                 browser.GetHost().DragTargetDragOver(GetMouseEvent(e), GetDragOperationsMask(e.AllowedEffects));
             }
@@ -787,7 +787,7 @@ namespace CefSharp.Wpf
 
         private void OnDragEnter(object sender, DragEventArgs e)
         {
-            if(browser != null)
+            if (browser != null)
             {
                 browser.GetHost().DragTargetDragEnter(e.GetDragDataWrapper(), GetMouseEvent(e), GetDragOperationsMask(e.AllowedEffects));
             }
@@ -859,7 +859,7 @@ namespace CefSharp.Wpf
 
                     if (notifyDpiChanged)
                     {
-                        if(browser != null)
+                        if (browser != null)
                         {
                             browser.GetHost().NotifyScreenInfoChanged();
                         }
@@ -1011,28 +1011,28 @@ namespace CefSharp.Wpf
                 case WM.KEYUP:
                 case WM.CHAR:
                 case WM.IME_CHAR:
-                { 
-                    if (!IsKeyboardFocused)
                     {
+                        if (!IsKeyboardFocused)
+                        {
+                            break;
+                        }
+
+                        if (message == (int)WM.SYSKEYDOWN &&
+                            wParam.ToInt32() == KeyInterop.VirtualKeyFromKey(Key.F4))
+                        {
+                            // We don't want CEF to receive this event (and mark it as handled), since that makes it impossible to
+                            // shut down a CefSharp-based app by pressing Alt-F4, which is kind of bad.
+                            return IntPtr.Zero;
+                        }
+
+                        if (browser != null)
+                        {
+                            browser.GetHost().SendKeyEvent(message, wParam.CastToInt32(), lParam.CastToInt32());
+                            handled = true;
+                        }
+
                         break;
                     }
-
-                    if (message == (int)WM.SYSKEYDOWN &&
-                        wParam.ToInt32() == KeyInterop.VirtualKeyFromKey(Key.F4))
-                    {
-                        // We don't want CEF to receive this event (and mark it as handled), since that makes it impossible to
-                        // shut down a CefSharp-based app by pressing Alt-F4, which is kind of bad.
-                        return IntPtr.Zero;
-                    }
-
-                    if (browser != null)
-                    {
-                        browser.GetHost().SendKeyEvent(message, wParam.CastToInt32(), lParam.CastToInt32());    
-                        handled = true;
-                    }
-
-                    break;
-                }
             }
 
             return IntPtr.Zero;
@@ -1055,7 +1055,7 @@ namespace CefSharp.Wpf
 
         private void SetPopupSizeAndPositionImpl(int width, int height, int x, int y)
         {
-            popup.Width = width ;
+            popup.Width = width;
             popup.Height = height;
 
             var popupOffset = new Point(x, y);
@@ -1146,7 +1146,7 @@ namespace CefSharp.Wpf
                 var message = (int)(e.IsDown ? WM.KEYDOWN : WM.KEYUP);
                 var virtualKey = KeyInterop.VirtualKeyFromKey(e.Key);
 
-                if(browser != null)
+                if (browser != null)
                 {
                     browser.GetHost().SendKeyEvent(message, virtualKey, (int)modifiers);
                     e.Handled = true;
@@ -1225,13 +1225,15 @@ namespace CefSharp.Wpf
                 return;
             }
 
-            var modifiers = e.GetModifiers();
-            var mouseUp = (e.ButtonState == MouseButtonState.Released);
-            var point = e.GetPosition(this);
-
             if (browser != null)
             {
+                var modifiers = e.GetModifiers();
+                var mouseUp = (e.ButtonState == MouseButtonState.Released);
+                var point = e.GetPosition(this);
+
                 browser.GetHost().SendMouseClickEvent((int)point.X, (int)point.Y, (MouseButtonType)e.ChangedButton, mouseUp, e.ClickCount, modifiers);
+
+                e.Handled = true;
             }
         }
 
