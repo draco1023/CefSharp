@@ -212,6 +212,13 @@ namespace CefSharp.Wpf
 
                     IsVisibleChanged -= OnIsVisibleChanged;
 
+                    if (popup != null)
+                    {
+                        popup.Opened -= PopupOpened;
+                        popup.Closed -= PopupClosed;
+                        popup = null;
+                    }
+
                     if (tooltipTimer != null)
                     {
                         tooltipTimer.Tick -= OnTooltipTimerTick;
@@ -991,8 +998,8 @@ namespace CefSharp.Wpf
                 Placement = PlacementMode.Absolute,
             };
 
-            newPopup.MouseEnter += PopupMouseEnter;
-            newPopup.MouseLeave += PopupMouseLeave;
+            newPopup.Opened += PopupOpened;
+            newPopup.Closed += PopupClosed;
 
             return newPopup;
         }
@@ -1183,28 +1190,31 @@ namespace CefSharp.Wpf
             }
         }
 
-        protected void PopupMouseEnter(object sender, MouseEventArgs e)
+        private void PopupOpened(object sender, EventArgs e)
         {
-            Focus();
-            Mouse.Capture(this);
+            if (Mouse.Captured != this)
+            {
+                Mouse.Capture(this);
+            }
         }
 
-        protected void PopupMouseLeave(object sender, MouseEventArgs e)
+        private void PopupClosed(object sender, EventArgs e)
         {
-            Mouse.Capture(null);
+            if (Mouse.Captured == this)
+            {
+                Mouse.Capture(null);
+            }
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             Focus();
             OnMouseButton(e);
-            Mouse.Capture(this);
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             OnMouseButton(e);
-            Mouse.Capture(null);
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
