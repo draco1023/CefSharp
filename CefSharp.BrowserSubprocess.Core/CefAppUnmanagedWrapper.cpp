@@ -423,15 +423,21 @@ namespace CefSharp
 
     void CefAppUnmanagedWrapper::OnRenderThreadCreated(CefRefPtr<CefListValue> extraInfo)
     {
-        auto extensionList = extraInfo->GetList(0);
+		if (extraInfo.get())
+		{
+			auto extensionList = extraInfo->GetList(0);
 
-        for (size_t i = 0; i < extensionList->GetSize(); i++)
-        {
-            auto extension = extensionList->GetList(i);
-            auto ext = gcnew CefExtension(StringUtils::ToClr(extension->GetString(0)), StringUtils::ToClr(extension->GetString(1)));
+			if (extensionList.get())
+			{
+				for (size_t i = 0; i < extensionList->GetSize(); i++)
+				{
+					auto extension = extensionList->GetList(i);
+					auto ext = gcnew CefExtension(StringUtils::ToClr(extension->GetString(0)), StringUtils::ToClr(extension->GetString(1)));
 
-            _extensions->Add(ext);
-        }
+					_extensions->Add(ext);
+				}
+			}
+		}
     }
 
     void CefAppUnmanagedWrapper::OnWebKitInitialized()
