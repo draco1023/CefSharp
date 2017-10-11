@@ -1,4 +1,4 @@
-// Copyright © 2010-2016 The CefSharp Authors. All rights reserved.
+// Copyright ?2010-2016 The CefSharp Authors. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
 
@@ -149,6 +149,17 @@ namespace CefSharp
                 {
                     cefValue->SetDouble(Convert::ToDouble(value));
                 }
+				else if (type == List<Object^>::typeid)
+				{
+					auto list = safe_cast<List<Object^>^>(value);
+					auto cefList = CefListValue::Create();
+					for (int i = 0; i < list->Count; i++)
+					{
+						auto value = list[i];
+						SerializeV8Object(cefList, i, value);
+					}
+					cefValue->SetList(cefList);
+				}
                 else if (type == Dictionary<String^, Object^>::typeid)
                 {
                     auto dictionary = safe_cast<Dictionary<String^, Object^>^>(value);
