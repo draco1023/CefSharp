@@ -2,11 +2,12 @@
 //
 // Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
 
-using System;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
 using CefSharp.Internals;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CefSharp
 {
@@ -47,7 +48,7 @@ namespace CefSharp
         public static void Undo(this IWebBrowser browser)
         {
             using (var frame = browser.GetFocusedFrame())
-            { 
+            {
                 ThrowExceptionIfFrameNull(frame);
 
                 frame.Undo();
@@ -197,34 +198,33 @@ namespace CefSharp
             stringBuilder.Append(methodName);
             stringBuilder.Append("(");
 
-            if(args.Length > 0)
-            { 
+            if (args.Length > 0)
+            {
                 for (int i = 0; i < args.Length; i++)
                 {
                     var obj = args[i];
-                    if(obj == null)
+                    if (obj == null)
                     {
                         stringBuilder.Append("null");
                     }
+                    else if (numberTypes.Contains(obj.GetType()))
+                    {
+                        stringBuilder.Append(Convert.ToString(args[i], CultureInfo.InvariantCulture));
+                    }
+                    else if (obj is bool)
+                    {
+                        stringBuilder.Append(args[i].ToString().ToLowerInvariant());
+                    }
                     else
                     {
-                        var encapsulateInSingleQuotes = !numberTypes.Contains(obj.GetType());
-                        if(encapsulateInSingleQuotes)
-                        {
-                            stringBuilder.Append("'");
-                        }
-
-                        stringBuilder.Append(args[i].ToString());
-
-                        if (encapsulateInSingleQuotes)
-                        {
-                            stringBuilder.Append("'");
-                        }
+                        stringBuilder.Append("'");
+                        stringBuilder.Append(args[i].ToString().Replace("'", "\\'"));
+                        stringBuilder.Append("'");
                     }
 
                     stringBuilder.Append(", ");
                 }
-            
+
                 //Remove the trailing comma
                 stringBuilder.Remove(stringBuilder.Length - 2, 2);
             }
@@ -309,7 +309,7 @@ namespace CefSharp
 
             var resourceHandler = handler as DefaultResourceHandlerFactory;
 
-            if(resourceHandler == null)
+            if (resourceHandler == null)
             {
                 throw new Exception("LoadHtml can only be used with the default IResourceHandlerFactory(DefaultResourceHandlerFactory) implementation");
             }
