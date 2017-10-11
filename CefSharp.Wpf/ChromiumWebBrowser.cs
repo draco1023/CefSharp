@@ -353,10 +353,21 @@ namespace CefSharp.Wpf
 
         void IRenderWebBrowser.SetCursor(IntPtr handle, CefCursorType type)
         {
-            UiThreadRunAsync(() =>
+            if (type == CefCursorType.Custom)
             {
-                Cursor = CursorInteropHelper.Create(new SafeFileHandle(handle, ownsHandle: false));
-            });
+                UiThreadRunSync(() =>
+                {
+                    Cursor = CursorInteropHelper.Create(new SafeFileHandle(handle, ownsHandle: false));
+                });
+            }
+            else
+            {
+                UiThreadRunAsync(() =>
+                {
+                    Cursor = CursorInteropHelper.Create(new SafeFileHandle(handle, ownsHandle: false));
+                });
+            }
+
         }
 
         void IWebBrowserInternal.SetAddress(AddressChangedEventArgs args)
@@ -915,6 +926,18 @@ namespace CefSharp.Wpf
             browserCreated = true;
 
             return true;
+        }
+
+        private void UiThreadRunSync(Action action, DispatcherPriority priority = DispatcherPriority.DataBind)
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                action();
+            }
+            else if (!Dispatcher.HasShutdownStarted)
+            {
+                Dispatcher.Invoke(action, priority);
+            }
         }
 
         private void UiThreadRunAsync(Action action, DispatcherPriority priority = DispatcherPriority.DataBind)
