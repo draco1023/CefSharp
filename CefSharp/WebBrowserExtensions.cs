@@ -194,6 +194,29 @@ namespace CefSharp
         /// <param name="args">the arguments to be passed as params to the method</param>
         public static void ExecuteScriptAsync(this IWebBrowser browser, string methodName, params object[] args)
         {
+            var script = GetScript(methodName, args);
+
+            browser.ExecuteScriptAsync(script);
+        }
+
+        /// <summary>
+        /// Evaluate some Javascript code in the context of this WebBrowser using the specified timeout.
+        /// The script will be executed asynchronously and the method returns a Task encapsulating the response from teh Javascript
+        /// This simple helper extension will encapsulate params in single quotes (unless int, uint, etc)
+        /// </summary>
+        /// <param name="browser">The ChromiumWebBrowser instance this method extends</param>
+        /// <param name="timeout">The timeout after which the Javascript code execution should be aborted.</param>
+        /// <param name="methodName">The javascript method name to execute</param>
+        /// <param name="args">the arguments to be passed as params to the method</param>
+        /// <returns><see cref="Task{JavascriptResponse}"/> that can be awaited to perform the script execution</returns>
+        public static Task<JavascriptResponse> EvaluateScriptAsync(this IWebBrowser browser, TimeSpan? timeout, string methodName, params object[] args)
+        {
+            var script = GetScript(methodName, args);
+            return browser.EvaluateScriptAsync(script, timeout);
+        }
+
+        private static string GetScript(string methodName, object[] args)
+        {
             var stringBuilder = new StringBuilder();
             stringBuilder.Append(methodName);
             stringBuilder.Append("(");
@@ -232,8 +255,7 @@ namespace CefSharp
             stringBuilder.Append(");");
 
             var script = stringBuilder.ToString();
-
-            browser.ExecuteScriptAsync(script);
+            return script;
         }
 
         /// <summary>
