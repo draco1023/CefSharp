@@ -22,7 +22,7 @@ namespace CefSharp
             Uri uri;
             if (Uri.TryCreate(url, UriKind.Absolute, out uri))
             {
-                Handlers.AddOrUpdate(uri.ToString(), handler, (k, v) => handler);
+                Handlers.AddOrUpdate(uri.AbsoluteUri, handler, (k, v) => handler);
                 return true;
             }
             return false;
@@ -38,7 +38,7 @@ namespace CefSharp
         /// Are there any <see cref="ResourceHandler"/>'s registered?
         /// </summary>
         public bool HasHandlers
-        { 
+        {
             get { return Handlers.Count > 0; }
         }
 
