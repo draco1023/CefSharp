@@ -2,10 +2,10 @@
 //
 // Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
 
-using System;
-using System.Windows.Forms;
 using CefSharp.Internals;
 using CefSharp.WinForms.Internals;
+using System;
+using System.Windows.Forms;
 
 namespace CefSharp.WinForms
 {
@@ -103,9 +103,6 @@ namespace CefSharp.WinForms
 
         protected override void Dispose(bool disposing)
         {
-            // Don't utilize any of the handlers anymore:
-            this.SetHandlersToNull();
-
             Cef.RemoveDisposable(this);
 
             if (disposing)
@@ -142,6 +139,10 @@ namespace CefSharp.WinForms
                 TitleChanged = null;
                 IsBrowserInitializedChanged = null;
             }
+
+            // Don't utilize any of the handlers anymore:
+            this.SetHandlersToNull();
+
             base.Dispose(disposing);
         }
 
@@ -306,7 +307,7 @@ namespace CefSharp.WinForms
         }
 
         bool IWebBrowserInternal.HasParent { get; set; }
-        
+
         IntPtr IWebBrowserInternal.ControlHandle
         {
             get { return controlHandle; }
@@ -339,7 +340,7 @@ namespace CefSharp.WinForms
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);
-            
+
             ResizeBrowser();
         }
 

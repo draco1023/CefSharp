@@ -184,9 +184,6 @@ namespace CefSharp.Wpf
                 LoadingStateChanged = null;
                 Rendering = null;
 
-                // No longer reference handlers:
-                this.SetHandlersToNull();
-
                 if (isdisposing)
                 {
                     browser = null;
@@ -245,6 +242,9 @@ namespace CefSharp.Wpf
                         WebBrowser = null;
                     });
                 }
+
+                // No longer reference handlers:
+                this.SetHandlersToNull();
 
                 Cef.RemoveDisposable(this);
 

@@ -134,9 +134,6 @@ namespace CefSharp.OffScreen
 
         protected virtual void Dispose(bool disposing)
         {
-            // Don't reference handlers any longer:
-            this.SetHandlersToNull();
-
             // Don't reference event listeners any longer:
             LoadError = null;
             FrameLoadStart = null;
@@ -175,6 +172,9 @@ namespace CefSharp.OffScreen
                     managedCefBrowserAdapter = null;
                 }
             }
+
+            // Don't reference handlers any longer:
+            this.SetHandlersToNull();
         }
 
         /// <summary>
